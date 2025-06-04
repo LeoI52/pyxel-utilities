@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+src/pyxel_utilities/__init__.py
+src/pyxel_utilities.egg-info/PKG-INFO
+src/pyxel_utilities.egg-info/SOURCES.txt
+src/pyxel_utilities.egg-info/dependency_links.txt
+src/pyxel_utilities.egg-info/top_level.txt
