@@ -1,0 +1,23 @@
+from pyxel_utilities import *
+import pyxel
+import time
+
+def update_main():
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        manager.change_scene_closing_doors(1, 2, 1, action=lambda:time.sleep(1))
+
+def draw_main():
+    pyxel.cls(10)
+
+def update_game():
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        manager.change_scene(0)
+
+def draw_game():
+    pyxel.cls(8)
+
+main_scene = Scene(0, "Main", update_main, draw_main)
+game_scene = Scene(1, "Game", update_game, draw_game)
+manager = PyxelManager(228, 128, [main_scene, game_scene], fullscreen=True, mouse=True)
+
+manager.run()

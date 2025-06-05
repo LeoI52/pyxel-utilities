@@ -1,7 +1,7 @@
 """
 @author : Léo Imbert
 @created : 15/10/2024
-@updated : 04/06/2025
+@updated : 05/06/2025
 """
 
 from .var import DEFAULT_PYXEL_COLORS
@@ -14,6 +14,7 @@ class PyxelManager:
         
         self.__fps = fps
         self.__scenes = scenes
+        self.__transition = {}
 
         for scene in self.__scenes:
             if scene.id == default_scene_id:
@@ -82,11 +83,98 @@ class PyxelManager:
         if action:
             action()
 
+    def change_scene_dither(self, new_scene_id:int, speed:float, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+        self.__transition = {
+            "type":"dither",
+            "direction":0,
+            "new_scene_id":new_scene_id,
+            "speed":speed,
+            "transition_color":transition_color,
+            "new_camera_x":new_camera_x,
+            "new_camera_y":new_camera_y,
+            "action":action,
+            "dither":0
+        }
+
+    def change_scene_circle(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+        self.__transition = {
+            "type":"circle",
+            "direction":0,
+            "new_scene_id":new_scene_id,
+            "speed":speed,
+            "transition_color":transition_color,
+            "new_camera_x":new_camera_x,
+            "new_camera_y":new_camera_y,
+            "action":action,
+            "radius":0,
+            "max_radius":((pyxel.width ** 2 + pyxel.height ** 2) ** 0.5) / 2
+        }
+
+    def change_scene_closing_doors(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+        self.__transition = {
+            "type":"closing_doors",
+            "direction":0,
+            "new_scene_id":new_scene_id,
+            "speed":speed,
+            "transition_color":transition_color,
+            "new_camera_x":new_camera_x,
+            "new_camera_y":new_camera_y,
+            "action":action,
+            "w":0,
+            "x":self.__cam_x + pyxel.width
+        }
+
     def apply_palette_effect(self, effect_function, **kwargs):
         pyxel.colors.from_list(effect_function(self.__current_scene.palette, kwargs))
 
     def reset_palette(self):
         pyxel.colors.from_list(self.__current_scene.palette)
+
+    def handle_transitions(self):
+        if self.__transition.get("type") == "dither":
+            if self.__transition["direction"] == 0:
+                self.__transition["dither"] += self.__transition["speed"]
+            else:
+                self.__transition["dither"] -= self.__transition["speed"]
+            if self.__transition["dither"] > 1 and self.__transition["direction"] == 0:
+                self.__transition["direction"] = 1
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+            if self.__transition["dither"] < 0 and self.__transition["direction"] == 1:
+                self.__transition = {}
+                return
+            pyxel.dither(self.__transition["dither"])
+            pyxel.rect(self.__cam_x, self.__cam_y, pyxel.width, pyxel.height, self.__transition["transition_color"])
+            pyxel.dither(1)
+
+        elif self.__transition.get("type") == "circle":
+            if self.__transition["direction"] == 0:
+                self.__transition["radius"] += self.__transition["speed"]
+            else:
+                self.__transition["radius"] -= self.__transition["speed"]
+            if self.__transition["radius"] > self.__transition["max_radius"] and self.__transition["direction"] == 0:
+                self.__transition["direction"] = 1
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+            if self.__transition["radius"] < 0 and self.__transition["direction"] == 1:
+                self.__transition = {}
+                return
+            pyxel.circ(self.__cam_x + pyxel.width / 2, self.__cam_y + pyxel.height / 2, self.__transition["radius"], self.__transition["transition_color"])
+
+        elif self.__transition.get("type") == "closing_doors":
+            if self.__transition["direction"] == 0:
+                self.__transition["w"] += self.__transition["speed"]
+                self.__transition["x"] -= self.__transition["speed"]
+            else:
+                self.__transition["w"] -= self.__transition["speed"]
+                self.__transition["x"] += self.__transition["speed"]
+            if self.__transition["w"] > pyxel.width // 2 and self.__transition["direction"] == 0:
+                self.__transition["direction"] = 1
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+            if self.__transition["w"] < 0 and self.__transition["direction"] == 1:
+                self.__transition = {}
+                return
+            pyxel.rect(self.__cam_x, self.__cam_y, self.__transition["w"], pyxel.height, self.__transition["transition_color"])
+            pyxel.rect(self.__transition["x"], self.__cam_y, self.__transition["w"], pyxel.height, self.__transition["transition_color"])
+
 
     def update(self):
         self.__cam_x += (self.__cam_tx - self.__cam_x) * 0.1
@@ -99,10 +187,12 @@ class PyxelManager:
         else:
             pyxel.camera(self.__cam_x, self.__cam_y)
 
-        self.__current_scene.update()
+        if not self.__transition.get("type"):
+            self.__current_scene.update()
 
     def draw(self):
         self.__current_scene.draw()
+        self.handle_transitions()
 
     def run(self):
         pyxel.run(self.update, self.draw)
