@@ -14,12 +14,9 @@ class PyxelManager:
     def __init__(self, width:int, height:int, scenes:list, default_scene_id:int=0, fps:int=60, fullscreen:bool=False, mouse:bool=False, quit_key:int=pyxel.KEY_ESCAPE, camera_x:int=0, camera_y:int=0):
         
         self.__fps = fps
-        self.__scenes = scenes
+        self.__scenes_dict = {scene.id:scene for scene in scenes}
+        self.__current_scene = self.__scenes_dict.get(default_scene_id, 0)
         self.__transition = {}
-
-        for scene in self.__scenes:
-            if scene.id == default_scene_id:
-                self.__current_scene = scene
 
         self.__cam_x = self.__cam_tx = camera_x
         self.__cam_y = self.__cam_ty = camera_y
@@ -42,7 +39,7 @@ class PyxelManager:
     
     @property
     def camera_y(self)-> int:
-        self.__cam_y
+        return self.__cam_y
 
     @property
     def mouse_x(self)-> int:
@@ -64,16 +61,18 @@ class PyxelManager:
         self.__cam_tx = new_camera_x
         self.__cam_ty = new_camera_y
 
-    def shake_camera(self, amout:int, sub_amount:float):
-        self.__shake_amount = amout
+    def shake_camera(self, amount:int, sub_amount:float):
+        self.__shake_amount = amount
         self.__sub_shake_amount = sub_amount
 
-    def change_scene(self, new_scene_id:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene(self, new_scene_id:int, new_camera_x:int=0, new_camera_y:int=0):
         self.set_camera(new_camera_x, new_camera_y)
 
-        for scene in self.__scenes:
-            if scene.id == new_scene_id:
-                self.__current_scene = scene
+        if self.__current_scene.on_exit:
+            self.__current_scene.on_exit()
+        self.__current_scene = self.__scenes_dict.get(new_scene_id, 0)
+        if self.__current_scene.on_enter:
+            self.__current_scene.on_enter()
 
         if self.__current_scene.pyxres_path:
             pyxel.load(self.__current_scene.pyxres_path)
@@ -81,10 +80,7 @@ class PyxelManager:
         pyxel.screen_mode(self.__current_scene.screen_mode)
         pyxel.colors.from_list(self.__current_scene.palette)
 
-        if action:
-            action()
-
-    def change_scene_dither(self, new_scene_id:int, speed:float, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_dither(self, new_scene_id:int, speed:float, transition_color:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"dither",
             "direction":1,
@@ -93,11 +89,10 @@ class PyxelManager:
             "transition_color":transition_color,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "dither":0
         }
 
-    def change_scene_circle(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_circle(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"circle",
             "direction":1,
@@ -106,12 +101,11 @@ class PyxelManager:
             "transition_color":transition_color,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "radius":0,
             "max_radius":((pyxel.width ** 2 + pyxel.height ** 2) ** 0.5) / 2
         }
 
-    def change_scene_closing_doors(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_closing_doors(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"closing_doors",
             "direction":1,
@@ -120,12 +114,11 @@ class PyxelManager:
             "transition_color":transition_color,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "w":0,
             "x":self.__cam_x + pyxel.width
         }
 
-    def change_scene_rectangle_right_left(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_rectangle_right_left(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"rectangle_right_left",
             "direction":1,
@@ -134,12 +127,11 @@ class PyxelManager:
             "transition_color":transition_color,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "x":self.__cam_x + pyxel.width,
             "w":0
         }
 
-    def change_scene_rectangle_left_right(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_rectangle_left_right(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"rectangle_left_right",
             "direction":1,
@@ -148,12 +140,11 @@ class PyxelManager:
             "transition_color":transition_color,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "x":self.__cam_x,
             "w":0
         }
 
-    def change_scene_outer_circle(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_outer_circle(self, new_scene_id:int, speed:int, transition_color:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"outer_circle",
             "direction":1,
@@ -162,12 +153,11 @@ class PyxelManager:
             "transition_color":transition_color,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "start_end":int(((pyxel.width ** 2 + pyxel.height ** 2) ** 0.5) / 2) + 1,
             "end":int(((pyxel.width ** 2 + pyxel.height ** 2) ** 0.5) / 2) + 1
         }
 
-    def change_scene_triangle(self, new_scene_id:int, speed:int, transition_color:int, rotation_speed:int, new_camera_x:int=0, new_camera_y:int=0, action=None):
+    def change_scene_triangle(self, new_scene_id:int, speed:int, transition_color:int, rotation_speed:int, new_camera_x:int=0, new_camera_y:int=0):
         self.__transition = {
             "type":"triangle",
             "direction":1,
@@ -177,7 +167,6 @@ class PyxelManager:
             "rotation_speed":rotation_speed,
             "new_camera_x":new_camera_x,
             "new_camera_y":new_camera_y,
-            "action":action,
             "size":0,
             "angle":270
         }
@@ -195,7 +184,7 @@ class PyxelManager:
 
             if self.__transition["dither"] > 1 and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["dither"] < 0 and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -208,7 +197,7 @@ class PyxelManager:
 
             if self.__transition["radius"] > self.__transition["max_radius"] and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["radius"] < 0 and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -220,7 +209,7 @@ class PyxelManager:
 
             if self.__transition["w"] > pyxel.width // 2 and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["w"] < 0 and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -234,7 +223,7 @@ class PyxelManager:
 
             if self.__transition["w"] > pyxel.width and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["w"] < 0 and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -247,7 +236,7 @@ class PyxelManager:
 
             if self.__transition["w"] > pyxel.width and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["w"] < 0 and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -258,7 +247,7 @@ class PyxelManager:
 
             if self.__transition["end"] < 0 and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["end"] > self.__transition["start_end"] and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -273,7 +262,7 @@ class PyxelManager:
 
             if self.__transition["size"] / 2.5 > max(pyxel.width, pyxel.height) and self.__transition["direction"] == 1:
                 self.__transition["direction"] = -1
-                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"], self.__transition["action"])
+                self.change_scene(self.__transition["new_scene_id"], self.__transition["new_camera_x"], self.__transition["new_camera_y"])
             if self.__transition["size"] < 0 and self.__transition["direction"] == -1:
                 self.__transition = {}
                 return
@@ -307,7 +296,7 @@ class PyxelManager:
 
 class Scene:
 
-    def __init__(self, id:int, title:str, update, draw, pyxres_path:str=None, palette:list=DEFAULT_PYXEL_COLORS, screen_mode:int=0):
+    def __init__(self, id:int, title:str, update, draw, pyxres_path:str=None, palette:list=DEFAULT_PYXEL_COLORS, screen_mode:int=0, on_exit=None, on_enter=None):
         self.id = id
         self.title = title
         self.update = update
@@ -315,3 +304,5 @@ class Scene:
         self.pyxres_path = pyxres_path
         self.palette = palette
         self.screen_mode = screen_mode
+        self.on_exit = on_exit
+        self.on_enter = on_enter
