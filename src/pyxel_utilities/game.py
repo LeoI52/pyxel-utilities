@@ -306,3 +306,4 @@ class Scene:
         self.screen_mode = screen_mode
         self.on_exit = on_exit
         self.on_enter = on_enter
+        
