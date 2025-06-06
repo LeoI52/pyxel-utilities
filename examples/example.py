@@ -4,7 +4,7 @@ import time
 
 def update_main():
     if pyxel.btnp(pyxel.KEY_SPACE):
-        manager.change_scene_closing_doors(1, 2, 1, action=lambda:time.sleep(1))
+        manager.change_scene_triangle(1, 10, 1, 10, action=lambda:time.sleep(1))
 
 def draw_main():
     pyxel.cls(10)
