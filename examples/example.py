@@ -6,6 +6,11 @@ def update_main():
     if pyxel.btnp(pyxel.KEY_SPACE):
         manager.change_scene_triangle(1, 10, 1, 10)
 
+    if pyxel.btn(pyxel.KEY_A):
+        manager.apply_palette_effect(brightness_adjusted_palette, factor=1.5)
+    else:
+        manager.reset_palette()
+
 def draw_main():
     pyxel.cls(10)
 
