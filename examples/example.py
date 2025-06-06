@@ -2,12 +2,13 @@ from pyxel_utilities import *
 import pyxel
 import time
 
+
 def update_main():
     if pyxel.btnp(pyxel.KEY_SPACE):
         manager.change_scene_triangle(1, 10, 1, 10)
 
     if pyxel.btn(pyxel.KEY_A):
-        manager.apply_palette_effect(brightness_adjusted_palette, factor=1.5)
+        manager.apply_palette_effect(posterize_palette, levels=2)
     else:
         manager.reset_palette()
 

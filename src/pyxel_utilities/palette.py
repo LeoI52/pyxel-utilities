@@ -145,3 +145,15 @@ def brightness_adjusted_palette(original_palette:list, kwargs:dict)-> list:
         new_b = min(255, max(0, int(b * factor)))
         palette.append(rgb_to_hex(new_r, new_g, new_b))
     return palette
+
+def posterize_palette(original_palette:list, kwargs:dict)-> list:
+    palette = []
+    levels = kwargs.get("levels", 4)
+    factor = 255 // (levels - 1)
+    for color in original_palette:
+        r, g, b = hex_to_rgb(color)
+        r = round(r / factor) * factor
+        g = round(g / factor) * factor
+        b = round(b / factor) * factor
+        palette.append(rgb_to_hex(r, g, b))
+    return palette
