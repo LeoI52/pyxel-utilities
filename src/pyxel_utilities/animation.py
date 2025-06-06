@@ -22,8 +22,19 @@ def follow_path(x:int, y:int, speed:float, current_point:int, points:list, loop:
 
     return x + direction_x * speed, y + direction_y * speed, current_point
 
+def target_motion(x:float, y:float, target_x:float, target_y:float, speed:float)-> tuple:
+    dx = target_x - x
+    dy = target_y - y
+    dist = math.hypot(dx, dy)
+    if dist == 0:
+        return x, y
+    return x + dx / dist * speed, y + dy / dist * speed
+
 def lerp(start:float, end:float, speed:float=0.1)-> float:
     return start + (end - start) * speed
+
+def ease_in_out(value:float)-> float:
+    return 3 * value ** 2 - 2 * value ** 3
 
 def wave_motion(value:float, wave_speed:float, wave_height:float, time:int)-> float:
     return value + (math.cos(time / wave_speed)) * wave_height
