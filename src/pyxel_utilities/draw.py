@@ -4,6 +4,7 @@
 @updated : 07/06/2025
 """
 
+from .other import get_anchored_position
 from .vars import *
 import random
 import pyxel
@@ -21,10 +22,10 @@ class Sprite:
 
 class Animation:
 
-    def __init__(self, sprite:Sprite, frames:int=1, frame_interval:int=20, loop:bool=True):
+    def __init__(self, sprite:Sprite, total_frames:int=1, frame_duration:int=20, loop:bool=True):
         self.sprite = sprite
-        self.__frames = frames
-        self.frame_interval = frame_interval
+        self.__total_frames = total_frames
+        self.frame_duration = frame_duration
         self.__loop = loop
         self.__start_frame = pyxel.frame_count
         self.current_frame = 0
@@ -45,25 +46,18 @@ class Animation:
         if self.is_finished():
             return
         
-        if pyxel.frame_count - self.__start_frame >= self.frame_interval:
+        if pyxel.frame_count - self.__start_frame >= self.frame_duration:
             self.__start_frame = pyxel.frame_count
             self.current_frame += 1
-            if self.current_frame >= self.__frames:
+            if self.current_frame >= self.__total_frames:
                 if self.__loop:
                     self.current_frame = 0
                 else:
                     self.__is_finished = True
-                    self.current_frame = self.__frames - 1
+                    self.current_frame = self.__total_frames - 1
 
     def draw(self, x:int, y:int, anchor:int=ANCHOR_TOP_LEFT):
-        if anchor in [ANCHOR_TOP_RIGHT, ANCHOR_BOTTOM_RIGHT, ANCHOR_RIGHT]:
-            x -= self.sprite.w
-        if anchor in [ANCHOR_BOTTOM_LEFT, ANCHOR_BOTTOM_RIGHT, ANCHOR_BOTTOM]:
-            y -= self.sprite.h
-        if anchor in [ANCHOR_TOP, ANCHOR_BOTTOM, ANCHOR_CENTER]:
-            x -= self.sprite.w // 2
-        if anchor in [ANCHOR_LEFT, ANCHOR_RIGHT, ANCHOR_CENTER]:
-            y -= self.sprite.h // 2
+        x, y = get_anchored_position(x, y, self.sprite.w, self.sprite.h, anchor)
 
         w = -self.sprite.w if self.sprite.flip_horizontal else self.sprite.w
         h = -self.sprite.h if self.sprite.flip_vertical else self.sprite.h
