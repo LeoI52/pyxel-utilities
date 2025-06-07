@@ -1,7 +1,7 @@
 """
 @author : Léo Imbert
 @created : 15/10/2024
-@updated : 06/06/2025
+@updated : 07/06/2025
 """
 
 import math
