@@ -1,0 +1,133 @@
+"""
+@author : Léo Imbert
+@created : 15/10/2024
+@updated : 07/06/2025
+"""
+
+import random
+import pyxel
+
+class TriangleLight:
+
+    def __init__(self, x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, lights_substitution_colors:dict, turn_frames:int, turn_on_chance:float=1, turn_off_chance:float=0):
+        self.__vertices = [(x1, y1), (x2, y2), (x3, y3)]
+        self.__lights_substitution_colors = lights_substitution_colors
+        self.__points = self.__generate_points_list()
+        self.on = True
+        self.turn_on_chance = turn_on_chance
+        self.turn_off_chance = turn_off_chance
+        self.__start_frame = pyxel.frame_count
+        self.turn_frames = turn_frames
+
+    def __is_point_in_triangle(self, px:int, py:int)-> bool:
+        (x1, y1), (x2, y2), (x3, y3) = self.__vertices
+
+        def triangle_area(x1, y1, x2, y2, x3, y3):
+            return abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0)
+        
+        total_area = triangle_area(x1, y1, x2, y2, x3, y3)
+
+        a1 = triangle_area(px, py, x2, y2, x3, y3)
+        a2 = triangle_area(x1, y1, px, py, x3, y3)
+        a3 = triangle_area(x1, y1, x2, y2, px, py)
+
+        return abs(total_area - (a1 + a2 + a3)) < 1e-6
+
+    def __generate_points_list(self)-> list:
+        (x1, y1), (x2, y2), (x3, y3) = self.__vertices
+        
+        min_x = min(x1, x2, x3)
+        max_x = max(x1, x2, x3)
+        min_y = min(y1, y2, y3)
+        max_y = max(y1, y2, y3)
+
+        return [(x, y) for x in range(min_x, max_x + 1) for y in range(min_y, max_y + 1) if self.__is_point_in_triangle(x, y)]
+
+    def draw(self, camera_x:int=0, camera_y:int=0):
+        if pyxel.frame_count - self.__start_frame >= self.turn_frames:
+            self.__start_frame = pyxel.frame_count
+
+            if self.on and random.random() <= self.turn_off_chance:
+                self.on = False
+            elif not self.on and random.random() <= self.turn_on_chance:
+                self.on = True
+
+        if not self.on:
+            return
+
+        (x1, y1), (x2, y2), (x3, y3) = self.__vertices
+
+        min_x = min(x1, x2, x3)
+        max_x = max(x1, x2, x3)
+        min_y = min(y1, y2, y3)
+        max_y = max(y1, y2, y3)
+
+        if not camera_x <= min_x < camera_x + pyxel.width and not camera_y <= min_y < camera_y + pyxel.height and not camera_x <= max_x < camera_x + pyxel.width and not camera_y <= max_y < camera_y + pyxel.height:
+            return
+        
+        for x, y in self.__points:
+            if camera_x <= x < camera_x + pyxel.width and camera_y <= y < camera_y + pyxel.height:
+                current_color = pyxel.pget(x, y)
+                if current_color in self.__lights_substitution_colors:
+                    pyxel.pset(x, y, self.__lights_substitution_colors[current_color])
+
+class CircleLight:
+
+    def __init__(self, x:int, y:int, radius:int, lights_substitution_colors:dict, turn_frames:int, turn_on_chance:float=1, turn_off_chance:float=0):
+        self.__x= x
+        self.__y = y
+        self.__radius = radius
+        self.__lights_substitution_colors = lights_substitution_colors
+        self.__points = self.__generate_points_list()
+        self.on = True
+        self.turn_on_chance = turn_on_chance
+        self.turn_off_chance = turn_off_chance
+        self.__start_frame = pyxel.frame_count
+        self.turn_frames = turn_frames
+
+    def __generate_points_list(self)-> list:
+        return [(x, y) for x in range(self.__x - self.__radius, self.__x + self.__radius) for y in range(self.__y - self.__radius, self.__y + self.__radius) if (x - self.__x) ** 2 + (y - self.__y) ** 2 <= self.__radius ** 2]
+
+    def draw(self, camera_x:int=0, camera_y:int=0):
+        if pyxel.frame_count - self.__start_frame >= self.turn_frames:
+            self.__start_frame = pyxel.frame_count
+
+            if self.on and random.random() <= self.turn_off_chance:
+                self.on = False
+            elif not self.on and random.random() <= self.turn_on_chance:
+                self.on = True
+
+        if not self.on:
+            return
+
+        min_x = self.__x - self.__radius
+        max_x = self.__x + self.__radius
+        min_y = self.__y - self.__radius
+        max_y = self.__y + self.__radius
+
+        if not camera_x <= min_x < camera_x + pyxel.width and not camera_y <= min_y < camera_y + pyxel.height and not camera_x <= max_x < camera_x + pyxel.width and not camera_y <= max_y < camera_y + pyxel.height:
+            return
+        
+        for x, y in self.__points:
+            if camera_x <= x < camera_x + pyxel.width and camera_y <= y < camera_y + pyxel.height:
+                current_color = pyxel.pget(x, y)
+                if current_color in self.__lights_substitution_colors:
+                    pyxel.pset(x, y, self.__lights_substitution_colors[current_color])
+
+class LightManager:
+
+    def __init__(self):
+        self.__lights = []
+
+    def reset(self):
+        self.__lights = []
+
+    def add_light(self, light:TriangleLight|CircleLight):
+        self.__lights.append(light)
+
+    def remove_light(self, light:TriangleLight|CircleLight):
+        self.__lights.remove(light)
+
+    def draw(self, camera_x:int=0, camera_y:int=0):
+        for light in self.__lights:
+            light.draw(camera_x, camera_y)
