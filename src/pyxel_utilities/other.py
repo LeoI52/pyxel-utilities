@@ -8,7 +8,7 @@ from .vars import *
 import json
 import os
 
-class SavingSystem:
+class SavingSystem: 
 
     def __init__(self):
         self.__data = {}
@@ -25,8 +25,11 @@ class SavingSystem:
 
     def load(self, filename:str="save.json"):
         if os.path.isfile(filename):
-            with open(filename, "r") as file:
-                self.__data = json.load(file)
+            try:
+                with open(filename, "r") as file:
+                    self.__data = json.load(file)
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Failed to load {filename}: {e}")
 
 def get_anchored_position(x:int, y:int, w:int, h:int, anchor:int)-> tuple:
     if anchor in [ANCHOR_TOP_RIGHT, ANCHOR_BOTTOM_RIGHT, ANCHOR_RIGHT]:
