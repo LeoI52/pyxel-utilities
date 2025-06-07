@@ -9,7 +9,7 @@ import pyxel
 
 class TriangleLight:
 
-    def __init__(self, x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, lights_substitution_colors:dict, state_change_interval:int, turn_on_chance:float=1, turn_off_chance:float=0):
+    def __init__(self, x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, lights_substitution_colors:dict, state_change_interval:int=30, turn_on_chance:float=1, turn_off_chance:float=0):
         self.__vertices = [(x1, y1), (x2, y2), (x3, y3)]
         self.__lights_substitution_colors = lights_substitution_colors
         self.__points = self.__generate_points_list()
@@ -76,7 +76,7 @@ class TriangleLight:
 
 class CircleLight:
 
-    def __init__(self, x:int, y:int, radius:int, lights_substitution_colors:dict, state_change_interval:int, turn_on_chance:float=1, turn_off_chance:float=0):
+    def __init__(self, x:int, y:int, radius:int, lights_substitution_colors:dict, state_change_interval:int=30, turn_on_chance:float=1, turn_off_chance:float=0):
         self.__x= x
         self.__y = y
         self.__radius = radius
@@ -120,6 +120,64 @@ class CircleLight:
                 if current_color in self.__lights_substitution_colors:
                     pyxel.pset(x, y, self.__lights_substitution_colors[current_color])
 
+class QuadrilateralLight:
+
+    def __init__(self, x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, x4:int, y4:int, lights_substitution_colors:dict, state_change_interval:int=30, turn_on_chance:float=1, turn_off_chance:float=0):
+        self.__vertices = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+        self.__lights_substitution_colors = lights_substitution_colors
+        self.__points = self.__generate_points_list()
+        self.on = True
+        self.turn_on_chance = turn_on_chance
+        self.turn_off_chance = turn_off_chance
+        self.__start_frame = pyxel.frame_count
+        self.state_change_interval = state_change_interval
+
+    def __is_point_in_triangle(self, px:int, py:int, v1:tuple, v2:tuple, v3:tuple)-> bool:
+        def area(x1, y1, x2, y2, x3, y3):
+            return abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0)
+
+        a = area(*v1, *v2, *v3)
+        a1 = area(px, py, *v2, *v3)
+        a2 = area(*v1, px, py, *v3)
+        a3 = area(*v1, *v2, px, py)
+        return abs(a - (a1 + a2 + a3)) < 1e-2
+
+    def __is_point_in_quad(self, px:int, py:int)-> bool:
+        v1, v2, v3, v4 = self.__vertices
+        return (self.__is_point_in_triangle(px, py, v1, v2, v3) or self.__is_point_in_triangle(px, py, v1, v3, v4))
+
+    def __generate_points_list(self)-> list:
+        xs = [v[0] for v in self.__vertices]
+        ys = [v[1] for v in self.__vertices]
+        min_x, max_x = min(xs), max(xs)
+        min_y, max_y = min(ys), max(ys)
+
+        points = []
+        for x in range(min_x, max_x + 1):
+            for y in range(min_y, max_y + 1):
+                if self.__is_point_in_quad(x, y):
+                    points.append((x, y))
+        return points
+
+    def draw(self, camera_x:int=0, camera_y:int=0):
+        if pyxel.frame_count - self.__start_frame >= self.state_change_interval:
+            self._start_frame = pyxel.frame_count
+            if self.on and random.random() <= self.turn_off_chance:
+                self.on = False
+            elif not self.on and random.random() <= self.turn_on_chance:
+                self.on = True
+
+        if not self.on:
+            return
+
+        for x, y in self.__points:
+            screen_x = x - camera_x
+            screen_y = y - camera_y
+            if 0 <= screen_x < pyxel.width and 0 <= screen_y < pyxel.height:
+                current_color = pyxel.pget(x, y)
+                if current_color in self.__lights_substitution_colors:
+                    pyxel.pset(x, y, self.__lights_substitution_colors[current_color])
+
 class LightManager:
 
     def __init__(self):
@@ -128,10 +186,10 @@ class LightManager:
     def reset(self):
         self.__lights = []
 
-    def add_light(self, light:TriangleLight|CircleLight):
+    def add_light(self, light:TriangleLight|CircleLight|QuadrilateralLight):
         self.__lights.append(light)
 
-    def remove_light(self, light:TriangleLight|CircleLight):
+    def remove_light(self, light:TriangleLight|CircleLight|QuadrilateralLight):
         self.__lights.remove(light)
 
     def draw(self, camera_x:int=0, camera_y:int=0):

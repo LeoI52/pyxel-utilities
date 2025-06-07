@@ -2,6 +2,16 @@
 @author : Léo Imbert
 @created : 15/10/2024
 @updated : 07/06/2025
+
+TODO :
+- Checkbox
+- Vertical Slider
+- Debug Mode
+- Line Intersection Detection
+- Text Particle
+- Particle Curves
+- Particle Vector Fields
+- Scrollable Panel
 """
 
 from .animations import *
@@ -15,7 +25,7 @@ from .palette import *
 from .particles import *
 from .vars import *
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 __all__ = [
     "follow_path", "target_motion", "lerp", "ease_in_out", "wave_motion", "circular_motion", "elliptical_motion", "spiral_motion", "infinity_motion", "back_forth_motion",
@@ -28,7 +38,7 @@ __all__ = [
 
     "Text", "Slider", "Dialog", "DialogManager", "UIBar", "Button", "IconButton", "Entry", "text_size", "corrupted_text",
 
-    "TriangleLight", "CircleLight", "LightManager",
+    "TriangleLight", "CircleLight", "QuadrilateralLight", "LightManager",
 
     "SavingSystem", "get_anchored_position", "clamp",
 
