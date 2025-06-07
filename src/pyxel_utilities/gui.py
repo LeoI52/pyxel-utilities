@@ -101,7 +101,7 @@ class Text:
         if self.__blinking and pyxel.frame_count % (self.__blinking_frames) >= self.__blinking_frames // 2:
             return
 
-        x = self.x
+        # x = self.x
         y = self.y
 
         if "\n" in self.text:
@@ -113,40 +113,42 @@ class Text:
                     self.__draw_line(line, y + i * 6, camera_x, camera_y)
             return
         
-        if self.__relative:
-            x += camera_x
-            y += camera_y
+        self.__draw_line(self.text, y, camera_x, camera_y)
+        
+        # if self.__relative:
+        #     x += camera_x
+        #     y += camera_y
 
-        if self.__shadow:
-            Text(self.text, self.__shadow_x, self.__shadow_y, self.__shadow_color, self.__font_size, self.__anchor, relative=self.__relative, underline=self.__underline, underline_color=self.__shadow_color, wavy=self.__wavy, wave_height=self.__wave_height, wave_speed=self.__wave_speed).draw(camera_x, camera_y)
+        # if self.__shadow:
+        #     Text(self.text, self.__shadow_x, self.__shadow_y, self.__shadow_color, self.__font_size, self.__anchor, relative=self.__relative, underline=self.__underline, underline_color=self.__shadow_color, wavy=self.__wavy, wave_height=self.__wave_height, wave_speed=self.__wave_speed).draw(camera_x, camera_y)
 
-        if self.__font_size > 0:
-            for char_index, char in enumerate(self.text):
-                char_y = y + math.cos(pyxel.frame_count / self.__wave_speed + char_index * 0.3) * self.__wave_height if self.__wavy else y
+        # if self.__font_size > 0:
+        #     for char_index, char in enumerate(self.text):
+        #         char_y = y + math.cos(pyxel.frame_count / self.__wave_speed + char_index * 0.3) * self.__wave_height if self.__wavy else y
 
-                if char in characters_matrices:
-                    char_matrix = characters_matrices[char]
-                    char_width = len(char_matrix[0]) * self.__font_size
+        #         if char in characters_matrices:
+        #             char_matrix = characters_matrices[char]
+        #             char_width = len(char_matrix[0]) * self.__font_size
 
-                    x += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
-                    char_y += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
+        #             x += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
+        #             char_y += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
                     
-                    for row_index, row in enumerate(char_matrix):
-                        for col_index, pixel in enumerate(row):
-                            if pixel:
-                                pyxel.rect(x + col_index * self.__font_size, char_y + row_index * self.__font_size + (1 * self.__font_size if char in "gjpqy" else 0), self.__font_size, self.__font_size, self.__text_colors[char_index % len(self.__text_colors)])
+        #             for row_index, row in enumerate(char_matrix):
+        #                 for col_index, pixel in enumerate(row):
+        #                     if pixel:
+        #                         pyxel.rect(x + col_index * self.__font_size, char_y + row_index * self.__font_size + (1 * self.__font_size if char in "gjpqy" else 0), self.__font_size, self.__font_size, self.__text_colors[char_index % len(self.__text_colors)])
                     
-                    x += char_width + self.__font_size
+        #             x += char_width + self.__font_size
 
-            if self.__underline:
-                pyxel.rect(self.x, y + self.__text_height - self.__font_size, self.__text_width, self.__font_size, self.__underline_color)
-        else:
-            for char_index, char in enumerate(self.text):
-                char_y = y + math.cos(pyxel.frame_count / self.__wave_speed + char_index * 0.3) * self.__wave_height if self.__wavy else y
-                x += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
-                char_y += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
-                pyxel.text(x, char_y, char, self.__text_colors[char_index % len(self.__text_colors)])
-                x += 4
+        #     if self.__underline:
+        #         pyxel.rect(self.x, y + self.__text_height - self.__font_size, self.__text_width, self.__font_size, self.__underline_color)
+        # else:
+        #     for char_index, char in enumerate(self.text):
+        #         char_y = y + math.cos(pyxel.frame_count / self.__wave_speed + char_index * 0.3) * self.__wave_height if self.__wavy else y
+        #         x += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
+        #         char_y += random.uniform(-self.__glitch_intensity, self.__glitch_intensity)
+        #         pyxel.text(x, char_y, char, self.__text_colors[char_index % len(self.__text_colors)])
+        #         x += 4
 
 class Button:
 

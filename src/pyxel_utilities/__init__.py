@@ -15,7 +15,7 @@ from .palette import *
 from .particles import *
 from .vars import *
 
-__version__ = "0.1.13"
+__version__ = "1.0.0"
 
 __all__ = [
     "follow_path", "target_motion", "lerp", "ease_in_out", "wave_motion", "circular_motion", "elliptical_motion", "spiral_motion", "infinity_motion", "back_forth_motion",

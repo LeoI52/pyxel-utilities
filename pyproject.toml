@@ -1,6 +1,6 @@
 [project]
 name = "pyxel_utilities"
-version = "0.1.13"
+version = "1.0.0"
 description = "A bunch of pyxel utilities "
 authors = [{ name = "Léo Imbert", email = "leoimbert5210@gmail.com" }]
 license = "MIT"
