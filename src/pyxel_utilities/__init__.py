@@ -8,13 +8,14 @@ from .animations import *
 from .collisions import *
 from .draw import *
 from .game import *
+from .gui import *
 from .lights import *
 from .other import *
 from .palette import *
 from .particles import *
 from .vars import *
 
-__version__ = "0.1.12"
+__version__ = "0.1.13"
 
 __all__ = [
     "follow_path", "target_motion", "lerp", "ease_in_out", "wave_motion", "circular_motion", "elliptical_motion", "spiral_motion", "infinity_motion", "back_forth_motion",
@@ -24,6 +25,8 @@ __all__ = [
     "Sprite", "Animation", "rounded_rect", "rounded_rectb", "draw_speech_bubble", "draw_checkered_pattern", "draw_brick_wall", "draw_glitch", "draw_eye", "draw_moving_spiral",
 
     "PyxelManager", "Scene",
+
+    "Text", "Slider", "Dialog", "DialogManager", "UIBar", "Button", "IconButton", "Entry", "text_size", "corrupted_text",
 
     "TriangleLight", "CircleLight", "LightManager",
 
