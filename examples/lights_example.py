@@ -16,7 +16,7 @@ PALETTE = DEFAULT_PYXEL_COLORS
 PALETTE += brightness_adjusted_palette(PALETTE, {"factor":1.5})
 PALETTE[16] = 0x3d3d3d
 
-main_scene = Scene(0, "Example 1", update, draw, "assets.pyxres", PALETTE)
+main_scene = Scene(0, "Lights.py Example", update, draw, "assets.pyxres", PALETTE)
 scenes = [main_scene]
 manager = PyxelManager(228, 128, scenes, fullscreen=True, mouse=True)
 

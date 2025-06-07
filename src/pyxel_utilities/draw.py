@@ -106,18 +106,18 @@ def draw_speech_bubble(x:int, y:int, width:int, height:int, tail_size:int, tail_
     elif tail_position == TOP:
         pyxel.tri(tail_x - tail_size // 2, y, tail_x + tail_size // 2, y, tail_target_x, tail_target_y, color)
         if border:
-            pyxel.line(tail_x - tail_size // 2, y, tail_x, y - tail_size, border_color)
-            pyxel.line(tail_x + tail_size // 2, y, tail_x, y - tail_size, border_color)
+            pyxel.line(tail_x - tail_size // 2, y, tail_target_x, tail_target_y, border_color)
+            pyxel.line(tail_x + tail_size // 2, y, tail_target_x, tail_target_y, border_color)
     elif tail_position == LEFT:
         pyxel.tri(x, tail_y - tail_size // 2, x, tail_y + tail_size // 2, tail_target_x, tail_target_y, color)
         if border:
-            pyxel.line(x, tail_y - tail_size // 2, x - tail_size, tail_y, border_color)
-            pyxel.line(x, tail_y + tail_size // 2, x - tail_size, tail_y, border_color)
+            pyxel.line(x, tail_y - tail_size // 2, tail_target_x, tail_target_y, border_color)
+            pyxel.line(x, tail_y + tail_size // 2, tail_target_x, tail_target_y, border_color)
     elif tail_position == RIGHT:
         pyxel.tri(x + width, tail_y - tail_size // 2, x + width, tail_y + tail_size // 2,tail_target_x, tail_target_y,color)
         if border:
-            pyxel.line(x + width, tail_y - tail_size // 2, x + width + tail_size, tail_y, border_color)
-            pyxel.line(x + width, tail_y + tail_size // 2, x + width + tail_size, tail_y, border_color)
+            pyxel.line(x + width, tail_y - tail_size // 2, tail_target_x, tail_target_y, border_color)
+            pyxel.line(x + width, tail_y + tail_size // 2, tail_target_x, tail_target_y, border_color)
 
 def draw_checkered_pattern(x:int, y:int, width:int, height:int, cell_size:int, color1:int, color2:int):
     for row in range((height + cell_size - 1) // cell_size):
@@ -153,7 +153,7 @@ def draw_brick_wall(x:int, y:int, width:int, height:int, brick_width:int, brick_
 def draw_glitch(x:int, y:int, width:int, height:int, intensity:int, colors:list|int):
     colors = [colors] if isinstance(colors, int) else colors
     for _ in range(intensity):
-        glitch_y = random.randint(y, height)
+        glitch_y = random.randint(y, y + height)
         pyxel.rect(x, glitch_y, width, 1, random.choice(colors))
 
 def draw_eye(x:int, y:int, target_x:int, target_y:int, eye_radius:int, pupil_radius:int, eye_color:int=7, pupil_color:int=0, max_offset:int=4):
