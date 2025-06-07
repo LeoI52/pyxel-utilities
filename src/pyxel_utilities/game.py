@@ -8,6 +8,8 @@ from .vars import DEFAULT_PYXEL_COLORS
 import random
 import pyxel
 import math
+import sys
+import os
 
 class PyxelManager:
 
@@ -28,7 +30,7 @@ class PyxelManager:
         pyxel.mouse(mouse)
 
         if self.__current_scene.pyxres_path:
-            pyxel.load(self.__current_scene.pyxres_path)
+            pyxel.load(os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), self.__current_scene.pyxres_path))
         pyxel.title(self.__current_scene.title)
         pyxel.screen_mode(self.__current_scene.screen_mode)
         pyxel.colors.from_list(self.__current_scene.palette)
@@ -75,7 +77,7 @@ class PyxelManager:
             self.__current_scene.on_enter()
 
         if self.__current_scene.pyxres_path:
-            pyxel.load(self.__current_scene.pyxres_path)
+            pyxel.load(os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), self.__current_scene.pyxres_path))
         pyxel.title(self.__current_scene.title)
         pyxel.screen_mode(self.__current_scene.screen_mode)
         pyxel.colors.from_list(self.__current_scene.palette)

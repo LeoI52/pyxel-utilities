@@ -11,7 +11,7 @@ def follow_path(x:int, y:int, speed:float, current_point:int, points:list, loop:
     direction_y = points[current_point][1] - y
     distance = math.sqrt(direction_x ** 2 + direction_y ** 2)
 
-    if distance < speed - 1:
+    if distance < max(speed, 0.1):
         current_point = (current_point + 1) % len(points) if loop else current_point + 1
         if current_point >= len(points) and not loop:
             current_point -= 1
@@ -39,7 +39,7 @@ def ease_in_out(value:float)-> float:
 def wave_motion(value:float, wave_speed:float, wave_height:float, time:int)-> float:
     return value + (math.cos(time / wave_speed)) * wave_height
 
-def circular_motion(center_x:float, center_y:float, radius:float, speed:float, time:int)-> tuple:
+def circular_motion(center_x:float, center_y:float, radius:int, speed:float, time:int)-> tuple:
     angle = time * speed
     x = center_x + math.cos(angle) * radius
     y = center_y + math.sin(angle) * radius
@@ -58,7 +58,7 @@ def spiral_motion(center_x:float, center_y:float, initial_radius:float, growth_r
     y = center_y + math.sin(angle) * radius
     return x, y
 
-def infinity_motion(center_x:float, center_y:float, size:float, speed:float, time:int)-> tuple:
+def infinity_motion(center_x:float, center_y:float, size:int, speed:float, time:int)-> tuple:
     t = time * speed
     x = center_x + math.sin(t) * size
     y = center_y + math.sin(t * 2) * size / 2

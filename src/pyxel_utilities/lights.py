@@ -43,7 +43,7 @@ class TriangleLight:
 
         return [(x, y) for x in range(min_x, max_x + 1) for y in range(min_y, max_y + 1) if self.__is_point_in_triangle(x, y)]
 
-    def __is_on_screen(min_x:int, max_x:int, min_y:int, max_y:int, camera_x:int, camera_y:int)-> bool:
+    def __is_on_screen(self, min_x:int, max_x:int, min_y:int, max_y:int, camera_x:int, camera_y:int)-> bool:
         return not (max_x < camera_x or min_x >= camera_x + pyxel.width or max_y < camera_y or min_y >= camera_y + pyxel.height)
 
     def draw(self, camera_x:int=0, camera_y:int=0):
@@ -91,7 +91,7 @@ class CircleLight:
     def __generate_points_list(self)-> list:
         return [(x, y) for x in range(self.__x - self.__radius, self.__x + self.__radius) for y in range(self.__y - self.__radius, self.__y + self.__radius) if (x - self.__x) ** 2 + (y - self.__y) ** 2 <= self.__radius ** 2]
 
-    def __is_on_screen(min_x:int, max_x:int, min_y:int, max_y:int, camera_x:int, camera_y:int)-> bool:
+    def __is_on_screen(self, min_x:int, max_x:int, min_y:int, max_y:int, camera_x:int, camera_y:int)-> bool:
         return not (max_x < camera_x or min_x >= camera_x + pyxel.width or max_y < camera_y or min_y >= camera_y + pyxel.height)
 
     def draw(self, camera_x:int=0, camera_y:int=0):
