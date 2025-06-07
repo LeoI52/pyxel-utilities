@@ -136,10 +136,10 @@ class RectangleParticle:
 
 class TriangleParticle:
 
-    def __init__(self, x:int, y:int, side_lenght:int, colors:list|int, lifespan:int, speed:int|float, target_x:int, target_y:int, starting_angle:int=270, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, hollow:bool=False, rotating:bool=False, rotation_speed:int=1):
+    def __init__(self, x:int, y:int, side_length:int, colors:list|int, lifespan:int, speed:int|float, target_x:int, target_y:int, starting_angle:int=270, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, hollow:bool=False, rotating:bool=False, rotation_speed:int=1):
         self.__x = x
         self.__y = y
-        self.__side_lenght = side_lenght
+        self.__side_length = side_length
         self.__colors = [colors] if isinstance(colors, int) else colors
         self.__colors_length = len(self.__colors)
         self.__current_color = 0
@@ -179,9 +179,9 @@ class TriangleParticle:
         self.__y += abs(self.__speed_y) * self.__direction_y
 
         self.__lifespan -= 1
-        self.__side_lenght += self.__growing_speed
+        self.__side_length += self.__growing_speed
 
-        if self.__side_lenght <= 0:
+        if self.__side_length <= 0:
             self.__lifespan = 0
 
         if self.__lifespan <= self.__dither_duration and self.__dither_duration:
@@ -194,7 +194,7 @@ class TriangleParticle:
             self.__current_color = (self.__current_color + 1) % self.__colors_length
 
     def draw(self):
-        d = math.sqrt(3) / 3 * self.__side_lenght
+        d = math.sqrt(3) / 3 * self.__side_length
         x1, y1 = self.__x + d * math.cos(math.radians(0 + self.__starting_angle)), self.__y + d * math.sin(math.radians(0 + self.__starting_angle))
         x2, y2 = self.__x + d * math.cos(math.radians(120 + self.__starting_angle)), self.__y + d * math.sin(math.radians(120 + self.__starting_angle))
         x3, y3 = self.__x + d * math.cos(math.radians(240 + self.__starting_angle)), self.__y + d * math.sin(math.radians(240 + self.__starting_angle))
