@@ -1,10 +1,10 @@
 """
 @author : Léo Imbert
 @created : 15/10/2024
-@updated : 06/06/2025
+@updated : 07/06/2025
 """
 
-from .var import DEFAULT_PYXEL_COLORS
+from .vars import DEFAULT_PYXEL_COLORS
 import random
 import pyxel
 import math
@@ -306,4 +306,3 @@ class Scene:
         self.screen_mode = screen_mode
         self.on_exit = on_exit
         self.on_enter = on_enter
-        

@@ -9,7 +9,7 @@ import pyxel
 
 class TriangleLight:
 
-    def __init__(self, x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, lights_substitution_colors:dict, turn_frames:int, turn_on_chance:float=1, turn_off_chance:float=0):
+    def __init__(self, x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, lights_substitution_colors:dict, state_change_interval:int, turn_on_chance:float=1, turn_off_chance:float=0):
         self.__vertices = [(x1, y1), (x2, y2), (x3, y3)]
         self.__lights_substitution_colors = lights_substitution_colors
         self.__points = self.__generate_points_list()
@@ -17,7 +17,7 @@ class TriangleLight:
         self.turn_on_chance = turn_on_chance
         self.turn_off_chance = turn_off_chance
         self.__start_frame = pyxel.frame_count
-        self.turn_frames = turn_frames
+        self.state_change_interval = state_change_interval
 
     def __is_point_in_triangle(self, px:int, py:int)-> bool:
         (x1, y1), (x2, y2), (x3, y3) = self.__vertices
@@ -43,8 +43,11 @@ class TriangleLight:
 
         return [(x, y) for x in range(min_x, max_x + 1) for y in range(min_y, max_y + 1) if self.__is_point_in_triangle(x, y)]
 
+    def __is_on_screen(min_x:int, max_x:int, min_y:int, max_y:int, camera_x:int, camera_y:int)-> bool:
+        return not (max_x < camera_x or min_x >= camera_x + pyxel.width or max_y < camera_y or min_y >= camera_y + pyxel.height)
+
     def draw(self, camera_x:int=0, camera_y:int=0):
-        if pyxel.frame_count - self.__start_frame >= self.turn_frames:
+        if pyxel.frame_count - self.__start_frame >= self.state_change_interval:
             self.__start_frame = pyxel.frame_count
 
             if self.on and random.random() <= self.turn_off_chance:
@@ -62,7 +65,7 @@ class TriangleLight:
         min_y = min(y1, y2, y3)
         max_y = max(y1, y2, y3)
 
-        if not camera_x <= min_x < camera_x + pyxel.width and not camera_y <= min_y < camera_y + pyxel.height and not camera_x <= max_x < camera_x + pyxel.width and not camera_y <= max_y < camera_y + pyxel.height:
+        if not self.__is_on_screen(min_x, max_x, min_y, max_y, camera_x, camera_y):
             return
         
         for x, y in self.__points:
@@ -73,7 +76,7 @@ class TriangleLight:
 
 class CircleLight:
 
-    def __init__(self, x:int, y:int, radius:int, lights_substitution_colors:dict, turn_frames:int, turn_on_chance:float=1, turn_off_chance:float=0):
+    def __init__(self, x:int, y:int, radius:int, lights_substitution_colors:dict, state_change_interval:int, turn_on_chance:float=1, turn_off_chance:float=0):
         self.__x= x
         self.__y = y
         self.__radius = radius
@@ -83,13 +86,16 @@ class CircleLight:
         self.turn_on_chance = turn_on_chance
         self.turn_off_chance = turn_off_chance
         self.__start_frame = pyxel.frame_count
-        self.turn_frames = turn_frames
+        self.state_change_interval = state_change_interval
 
     def __generate_points_list(self)-> list:
         return [(x, y) for x in range(self.__x - self.__radius, self.__x + self.__radius) for y in range(self.__y - self.__radius, self.__y + self.__radius) if (x - self.__x) ** 2 + (y - self.__y) ** 2 <= self.__radius ** 2]
 
+    def __is_on_screen(min_x:int, max_x:int, min_y:int, max_y:int, camera_x:int, camera_y:int)-> bool:
+        return not (max_x < camera_x or min_x >= camera_x + pyxel.width or max_y < camera_y or min_y >= camera_y + pyxel.height)
+
     def draw(self, camera_x:int=0, camera_y:int=0):
-        if pyxel.frame_count - self.__start_frame >= self.turn_frames:
+        if pyxel.frame_count - self.__start_frame >= self.state_change_interval:
             self.__start_frame = pyxel.frame_count
 
             if self.on and random.random() <= self.turn_off_chance:
@@ -105,7 +111,7 @@ class CircleLight:
         min_y = self.__y - self.__radius
         max_y = self.__y + self.__radius
 
-        if not camera_x <= min_x < camera_x + pyxel.width and not camera_y <= min_y < camera_y + pyxel.height and not camera_x <= max_x < camera_x + pyxel.width and not camera_y <= max_y < camera_y + pyxel.height:
+        if not self.__is_on_screen(min_x, max_x, min_y, max_x, camera_x, camera_y):
             return
         
         for x, y in self.__points:
