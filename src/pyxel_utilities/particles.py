@@ -11,7 +11,7 @@ import math
 
 class OvalParticle:
 
-    def __init__(self, x:int, y:int, width:int, height:int, colors:list|int, lifespan:int, speed:int|float, target_x:int, target_y:int, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, wobble:bool=False, hollow:bool=False):
+    def __init__(self, x:int, y:int, width:int, height:int, colors:list|int, lifespan:int, speed:int|float, target_x:int, target_y:int, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, gravity:float=0, wobble:bool=False, hollow:bool=False):
         self.__x = x
         self.__y = y
         self.__width = width
@@ -23,12 +23,12 @@ class OvalParticle:
         self.__starting_lifespan = self.__lifespan
         self.__growing_speed = growing_speed
         self.__acceleration_speed = acceleration_speed
+        self.__gravity = gravity
         self.__wobble = wobble
         self.__wobble_offset = random.random() * 1000
         self.__hollow = hollow
         self.__dither = 1
         self.__dither_duration = max(dither_duration, 0)
-
 
         self.__direction_x = -1 if target_x - self.__x < 0 else 1
         self.__direction_y = -1 if target_y - self.__y < 0 else 1
@@ -48,11 +48,13 @@ class OvalParticle:
         return self.__lifespan
 
     def update(self):
-        self.__speed_x = abs(self.__speed_x) + self.__acceleration_speed
-        self.__speed_y = abs(self.__speed_y) + self.__acceleration_speed
+        self.__speed_x += self.__acceleration_speed * self.__direction_x
+        self.__speed_y += self.__acceleration_speed * self.__direction_y
 
-        self.__x += abs(self.__speed_x) * self.__direction_x
-        self.__y += abs(self.__speed_y) * self.__direction_y
+        self.__speed_y += self.__gravity
+
+        self.__x += self.__speed_x
+        self.__y += self.__speed_y
 
         if self.__wobble:
             self.__x += math.sin(self.__wobble_offset + pyxel.frame_count * 0.1)
@@ -81,7 +83,7 @@ class OvalParticle:
 
 class RectangleParticle:
 
-    def __init__(self, x:int, y:int, width:int, height:int, colors:list|int, lifespan:int,  speed:int|float, target_x:int, target_y:int, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, wobble:bool=False, hollow:bool=False):
+    def __init__(self, x:int, y:int, width:int, height:int, colors:list|int, lifespan:int,  speed:int|float, target_x:int, target_y:int, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, gravity:float=0, wobble:bool=False, hollow:bool=False):
         self.__x = x
         self.__y = y
         self.__width = width
@@ -93,6 +95,7 @@ class RectangleParticle:
         self.__starting_lifespan = self.__lifespan
         self.__growing_speed = growing_speed
         self.__acceleration_speed = acceleration_speed
+        self.__gravity = gravity
         self.__wobble = wobble
         self.__wobble_offset = random.random() * 1000
         self.__hollow = hollow
@@ -118,11 +121,13 @@ class RectangleParticle:
         return self.__lifespan
 
     def update(self):
-        self.__speed_x = abs(self.__speed_x) + self.__acceleration_speed
-        self.__speed_y = abs(self.__speed_y) + self.__acceleration_speed
+        self.__speed_x += self.__acceleration_speed * self.__direction_x
+        self.__speed_y += self.__acceleration_speed * self.__direction_y
 
-        self.__x += abs(self.__speed_x) * self.__direction_x
-        self.__y += abs(self.__speed_y) * self.__direction_y
+        self.__speed_y += self.__gravity
+
+        self.__x += self.__speed_x
+        self.__y += self.__speed_y
 
         if self.__wobble:
             self.__x += math.sin(self.__wobble_offset + pyxel.frame_count * 0.1)
@@ -151,7 +156,7 @@ class RectangleParticle:
 
 class TriangleParticle:
 
-    def __init__(self, x:int, y:int, side_length:int, colors:list|int, lifespan:int, speed:int|float, target_x:int, target_y:int, starting_angle:int=270, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, wobble:bool=False, hollow:bool=False, rotating:bool=False, rotation_speed:int=1):
+    def __init__(self, x:int, y:int, side_length:int, colors:list|int, lifespan:int, speed:int|float, target_x:int, target_y:int, starting_angle:int=270, growing_speed:float=0, acceleration_speed:float=0, dither_duration:int=0, gravity:float=0, wobble:bool=False, hollow:bool=False, rotating:bool=False, rotation_speed:int=1):
         self.__x = x
         self.__y = y
         self.__side_length = side_length
@@ -163,6 +168,7 @@ class TriangleParticle:
         self.__starting_angle = starting_angle
         self.__growing_speed = growing_speed
         self.__acceleration_speed = acceleration_speed
+        self.__gravity = gravity
         self.__wobble = wobble
         self.__wobble_offset = random.random() * 1000
         self.__hollow = hollow
@@ -190,11 +196,13 @@ class TriangleParticle:
         return self.__lifespan
 
     def update(self):
-        self.__speed_x = abs(self.__speed_x) + self.__acceleration_speed
-        self.__speed_y = abs(self.__speed_y) + self.__acceleration_speed
+        self.__speed_x += self.__acceleration_speed * self.__direction_x
+        self.__speed_y += self.__acceleration_speed * self.__direction_y
 
-        self.__x += abs(self.__speed_x) * self.__direction_x
-        self.__y += abs(self.__speed_y) * self.__direction_y
+        self.__speed_y += self.__gravity
+
+        self.__x += self.__speed_x
+        self.__y += self.__speed_y
 
         if self.__wobble:
             self.__x += math.sin(self.__wobble_offset + pyxel.frame_count * 0.1)
@@ -230,7 +238,7 @@ class TriangleParticle:
 
 class SpriteParticle:
 
-    def __init__(self, x:int, y:int, animation:Animation, lifespan:int, speed:int|float, target_x:int, target_y:int, acceleration_speed:float=0, dither_duration:int=0, wobble:bool=False):
+    def __init__(self, x:int, y:int, animation:Animation, lifespan:int, speed:int|float, target_x:int, target_y:int, acceleration_speed:float=0, dither_duration:int=0, gravity:float=0, wobble:bool=False):
         self.__x = x
         self.__y = y
         self.__animation = animation
@@ -238,6 +246,7 @@ class SpriteParticle:
         self.__acceleration_speed = acceleration_speed
         self.__dither = 1
         self.__dither_duration = dither_duration
+        self.__gravity = gravity
         self.__wobble = wobble
         self.__wobble_offset = random.random() * 1000
 
@@ -259,11 +268,13 @@ class SpriteParticle:
         return self.__lifespan
 
     def update(self):
-        self.__speed_x = abs(self.__speed_x) + self.__acceleration_speed
-        self.__speed_y = abs(self.__speed_y) + self.__acceleration_speed
+        self.__speed_x += self.__acceleration_speed * self.__direction_x
+        self.__speed_y += self.__acceleration_speed * self.__direction_y
 
-        self.__x += abs(self.__speed_x) * self.__direction_x
-        self.__y += abs(self.__speed_y) * self.__direction_y
+        self.__speed_y += self.__gravity
+
+        self.__x += self.__speed_x
+        self.__y += self.__speed_y
 
         if self.__wobble:
             self.__x += math.sin(self.__wobble_offset + pyxel.frame_count * 0.1)
